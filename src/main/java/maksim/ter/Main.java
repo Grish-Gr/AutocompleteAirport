@@ -1,21 +1,39 @@
 package maksim.ter;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.IOException;
-import java.io.RandomAccessFile;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.Date;
-import java.util.List;
-import java.util.SortedMap;
-import java.util.TreeMap;
-import java.util.stream.Stream;
+import java.io.*;
+import java.util.*;
 
 public class Main {
+
+    private static void f() throws IOException {
+        return;
+    }
+
     public static void main(String[] args) {
+        try {
+            RandomAccessFile airportsInfoFile = new RandomAccessFile("src/main/resources/airports.csv", "r");
+            AutocompleteAirportsService autocompleteAirports = new AutocompleteAirportsService(airportsInfoFile);
+            Scanner scanner = new Scanner(System.in);
+            System.out.println("Start work");
+            String command;
+            while (!(command = scanner.nextLine()).equals("end")){
+                long beforeUsedMem=Runtime.getRuntime().totalMemory()-Runtime.getRuntime().freeMemory();
+                autocompleteAirports.searchAirports(
+                    command,
+                    ((nameAirport, infoAirport) -> System.out.println(String.format("\"%s\"[%s]", nameAirport, infoAirport))),
+                    (((countFields, time) -> System.out.println(String.format("Количество найденных строк: %d Время, затраченное на поиск %d мс", countFields, time))))
+                );
+                long afterUsedMem=Runtime.getRuntime().totalMemory()-Runtime.getRuntime().freeMemory();
+                System.out.println(afterUsedMem - beforeUsedMem);
+            }
+            airportsInfoFile.close();
+
+            } catch(IOException e){
+                throw new RuntimeException(e);
+            } finally{
+            }
+        }
 
     }
-}
+
+
