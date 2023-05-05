@@ -1,5 +1,9 @@
 package maksim.ter;
 
+
+import maksim.ter.filters.FilterSearchRequest;
+import maksim.ter.filters.FilterSearchV2;
+
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.util.*;
@@ -29,21 +33,25 @@ public class AutocompleteAirportsService {
         Collections.sort(namesAirports);
     }
 
-    public void searchAirports(String nameAirport, ActionWithSearchAirport action, ActionAfterSearchingAirports afterAction) throws IOException {
+    public void searchAirports(String nameAirport, String filters, ActionWithSearchAirport action, ActionAfterSearchingAirports afterAction) throws IOException, BadRequestFilter{
+        boolean notFilter = filters.isBlank();
         long start = new Date().getTime();
+        FilterSearchV2 requestFilter = new FilterSearchV2(filters);
         int i = Collections.binarySearch(namesAirports, nameAirport.toLowerCase());
         if (i < 0) {
             i = -(i + 1);
         }
         int count = 0;
-        for (byte[] buffer = new byte[airportInformation.get(namesAirports.get(i)).getLengthStringInFile()];
-             namesAirports.get(i).startsWith(nameAirport.toLowerCase());
-             i++, buffer = new byte[airportInformation.get(namesAirports.get(i)).getLengthStringInFile()]
-        ) {
+        byte[] buffer;
+        for (; i < namesAirports.size() && namesAirports.get(i).startsWith(nameAirport.toLowerCase()); i++) {
+            buffer = new byte[airportInformation.get(namesAirports.get(i)).getLengthStringInFile()];
             airportsInfoFile.seek(airportInformation.get(namesAirports.get(i)).getStartPointerInFile());
             airportsInfoFile.read(buffer);
-            action.action(airportInformation.get(namesAirports.get(i)).getNameAirport(), new String(buffer));
-            count++;
+            String infoAirport = new String(buffer);
+            if (notFilter || requestFilter.checkFieldOnFilter(infoAirport.split(","))){
+                action.action(airportInformation.get(namesAirports.get(i)).getNameAirport(), infoAirport);
+                count++;
+            }
         }
         afterAction.action(count, new Date().getTime() - start);
     }
