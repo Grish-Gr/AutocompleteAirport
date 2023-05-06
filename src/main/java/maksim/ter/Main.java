@@ -7,10 +7,6 @@ import java.util.*;
 
 public class Main {
 
-    private static void f() throws IOException {
-        return;
-    }
-
     public static void main(String[] args) {
         try {
             InputStream stream = Thread.currentThread().getContextClassLoader().getResourceAsStream("airports.csv");
@@ -38,9 +34,9 @@ public class Main {
             }
 
         } catch (IOException e) {
-        throw new RuntimeException(e);
+            throw new RuntimeException(e);
         }
     }
-    }
+}
 
 
