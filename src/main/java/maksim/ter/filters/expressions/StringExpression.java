@@ -1,8 +1,8 @@
-package maksim.ter.filters;
+package maksim.ter.filters.expressions;
 
-import maksim.ter.Operation;
+import maksim.ter.filters.Operation;
 
-public class StringExpression extends Expression<String>{
+public class StringExpression extends Expression<String> {
     public StringExpression(Operation operation, String value, int numColumn, int idExpression) {
         super(operation, value, numColumn, idExpression);
     }

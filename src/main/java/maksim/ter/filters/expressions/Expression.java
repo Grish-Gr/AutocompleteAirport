@@ -1,6 +1,6 @@
-package maksim.ter.filters;
+package maksim.ter.filters.expressions;
 
-import maksim.ter.Operation;
+import maksim.ter.filters.Operation;
 
 public abstract class Expression<T> {
     protected final Operation operation;
@@ -19,5 +19,9 @@ public abstract class Expression<T> {
 
     public int getIdExpression() {
         return idExpression;
+    }
+
+    public int getNumColumn() {
+        return numColumn;
     }
 }

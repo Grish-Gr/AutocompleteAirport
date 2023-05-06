@@ -1,16 +1,15 @@
-package maksim.ter.filters;
+package maksim.ter.filters.expressions;
 
-import maksim.ter.Operation;
+import maksim.ter.filters.Operation;
 
-public class IntegerExpression extends Expression<Integer>{
-
-    public IntegerExpression(Operation operation, Integer value, int numColumn, int idExpression) {
+public class FloatExpression extends Expression<Float> {
+    public FloatExpression(Operation operation, Float value, int numColumn, int idExpression) {
         super(operation, value, numColumn, idExpression);
     }
 
     @Override
     public boolean check(String column) {
-        int num = Integer.parseInt(column);
+        float num = Float.parseFloat(column);
         switch (operation){
             case EQUALS: return num == value;
             case NO_EQUALS: return num != value;

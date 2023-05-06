@@ -1,66 +1,80 @@
 package maksim.ter;
 
 
-import maksim.ter.filters.FilterSearchRequest;
-import maksim.ter.filters.FilterSearchV2;
+import maksim.ter.filters.WrongRequestFilterException;
+import maksim.ter.filters.FilterRequestUtil;
 
+import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.RandomAccessFile;
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class AutocompleteAirportsService {
 
     private final List<String> namesAirports;
     private final HashMap<String, AirportInfoInFile> airportInformation;
-    private final RandomAccessFile airportsInfoFile;
 
-    public AutocompleteAirportsService(RandomAccessFile airportsInfoFile) throws IOException {
-        this.airportsInfoFile = airportsInfoFile;
+    public interface ActionWithSearchedAirport {
+        void action(String nameAirport, String infoAirport);
+    }
+
+    public interface ActionAfterSearchingAirports{
+        void action(int countFields, long time);
+    }
+
+    public AutocompleteAirportsService(BufferedReader airportsInfoFile) throws IOException {
         this.namesAirports = new ArrayList<>();
         this.airportInformation = new HashMap<>();
 
-        long currentPointer;
-        while ((currentPointer = airportsInfoFile.getFilePointer()) != airportsInfoFile.length()){
-            String[] data = airportsInfoFile.readLine().split(",");
+        int currentPointer = 0;
+        while (airportsInfoFile.ready()){
+            String line = airportsInfoFile.readLine();
+            String[] data = line.split(",");
             String nameAirport = data[1].substring(1, data[1].length() - 1);
-            int lengthStringInFile = (int) (airportsInfoFile.getFilePointer() - currentPointer - 1);
-            namesAirports.add(nameAirport.toLowerCase());
+            int lengthStringInFile = line.length();
+            namesAirports.add(nameAirport.toLowerCase() + data[0]);
             airportInformation.put(
-                nameAirport.toLowerCase(),
+                nameAirport.toLowerCase() + data[0],
                 new AirportInfoInFile(nameAirport, currentPointer, lengthStringInFile)
             );
+            currentPointer += lengthStringInFile + 1;
         }
         Collections.sort(namesAirports);
     }
 
-    public void searchAirports(String nameAirport, String filters, ActionWithSearchAirport action, ActionAfterSearchingAirports afterAction) throws IOException, BadRequestFilter{
-        boolean notFilter = filters.isBlank();
+    public void searchAirports(
+        BufferedReader airportsInfoFile,
+        String somethingSymbols,
+        String filters,
+        ActionWithSearchedAirport action,
+        ActionAfterSearchingAirports afterAction
+    ) throws IOException, WrongRequestFilterException {
         long start = new Date().getTime();
-        FilterSearchV2 requestFilter = new FilterSearchV2(filters);
-        int i = Collections.binarySearch(namesAirports, nameAirport.toLowerCase());
-        if (i < 0) {
-            i = -(i + 1);
-        }
+        int lengthPointer = 0;
         int count = 0;
-        byte[] buffer;
-        for (; i < namesAirports.size() && namesAirports.get(i).startsWith(nameAirport.toLowerCase()); i++) {
-            buffer = new byte[airportInformation.get(namesAirports.get(i)).getLengthStringInFile()];
-            airportsInfoFile.seek(airportInformation.get(namesAirports.get(i)).getStartPointerInFile());
-            airportsInfoFile.read(buffer);
-            String infoAirport = new String(buffer);
+        boolean notFilter = filters.isBlank();
+        FilterRequestUtil requestFilter = notFilter ? null : new FilterRequestUtil(filters);
+
+        List<AirportInfoInFile> infoInFiles = searchNamesAirportByWords(somethingSymbols);
+        for (AirportInfoInFile infoInFile: infoInFiles.stream().sorted(AirportInfoInFile::compareAirportInfoInFileByPointer).collect(Collectors.toList())){
+            airportsInfoFile.skip(infoInFile.getStartPointerInFile() - lengthPointer);
+            String infoAirport = airportsInfoFile.readLine();
             if (notFilter || requestFilter.checkFieldOnFilter(infoAirport.split(","))){
-                action.action(airportInformation.get(namesAirports.get(i)).getNameAirport(), infoAirport);
+                action.action(infoInFile.getNameAirport(), infoAirport);
                 count++;
             }
+            lengthPointer = infoInFile.getStartPointerInFile() + infoInFile.getLengthStringInFile() + 1;
         }
         afterAction.action(count, new Date().getTime() - start);
     }
-}
 
-interface ActionWithSearchAirport{
-    void action(String nameAirport, String infoAirport);
-}
-
-interface ActionAfterSearchingAirports{
-    void action(int countFields, long time);
+    private List<AirportInfoInFile> searchNamesAirportByWords(String somethingSymbols){
+        int ind = Collections.binarySearch(namesAirports, somethingSymbols.toLowerCase());
+        ind  = ind < 0 ? -(ind + 1) : ind;
+        List<AirportInfoInFile> infoInFiles = new ArrayList<>();
+        for (; ind < namesAirports.size() && namesAirports.get(ind).startsWith(somethingSymbols.toLowerCase()); ind++) {
+            infoInFiles.add(airportInformation.get(namesAirports.get(ind)));
+        }
+        return infoInFiles;
+    }
 }
