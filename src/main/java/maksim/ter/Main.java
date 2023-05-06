@@ -3,6 +3,7 @@ package maksim.ter;
 import maksim.ter.filters.WrongRequestFilterException;
 
 import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 public class Main {
@@ -10,14 +11,14 @@ public class Main {
     public static void main(String[] args) {
         try {
             InputStream stream = Thread.currentThread().getContextClassLoader().getResourceAsStream("airports.csv");
-            BufferedReader reader = new BufferedReader(new InputStreamReader(stream));
+            BufferedReader reader = new BufferedReader(new InputStreamReader(stream, StandardCharsets.UTF_8));
             AutocompleteAirportsService autocompleteAirports = new AutocompleteAirportsService(reader);
             Scanner scanner = new Scanner(System.in);
             String command;
             System.out.println("Напишите фильтры для поиска или завершите программу (\"!quit\"):");
             while (!(command = scanner.nextLine()).equals("!quit")){
                 stream = Thread.currentThread().getContextClassLoader().getResourceAsStream("airports.csv");
-                reader = new BufferedReader(new InputStreamReader(stream));
+                reader = new BufferedReader(new InputStreamReader(stream, StandardCharsets.UTF_8));
                 System.out.println("Напишите начальные символы для поиска:");
                 try{
                     autocompleteAirports.searchAirports(
