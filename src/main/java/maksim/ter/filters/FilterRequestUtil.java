@@ -132,7 +132,7 @@ public class FilterRequestUtil {
     }
 
     private String getStringValue(int startIndex, String expression){
-        return expression.substring(startIndex + 1, startIndex + 1 + expression.substring(startIndex + 1).indexOf("\""));
+        return expression.substring(startIndex + 1, startIndex + 1 + expression.substring(startIndex + 1).indexOf("'"));
     }
 
 }

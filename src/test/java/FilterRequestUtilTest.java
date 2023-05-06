@@ -13,7 +13,7 @@ public class FilterRequestUtilTest {
         };
 
         FilterRequestUtil filterRequest = new FilterRequestUtil(
-            "column[1]>3000 & column[4]=\"Russia\""
+            "column[1]>3000 & column[4]='Russia'"
         );
 
         Assertions.assertTrue(filterRequest.checkFieldOnFilter(data));
@@ -27,7 +27,7 @@ public class FilterRequestUtilTest {
         };
 
         FilterRequestUtil filterRequest = new FilterRequestUtil(
-            "column[1]<1000 | ((column[4]=\"Russia\" & column[8]<44.2) | column[11]=\"N\")"
+            "column[1]<1000 | ((column[4]='Russia' & column[8]<44.2) | column[11]='N')"
         );
 
         Assertions.assertTrue(filterRequest.checkFieldOnFilter(data));
@@ -42,7 +42,7 @@ public class FilterRequestUtilTest {
 
         Assertions.assertThrows(WrongRequestFilterException.class, () -> {
             FilterRequestUtil filterRequest = new FilterRequestUtil(
-                "column[1]<1000 | ((column[4]=\"Russia\" & column[8]<44.2) | column[11]=\"N\"))"
+                "column[1]<1000 | ((column[4]='Russia' & column[8]<44.2) | column[11]='N'))"
             );
         });
     }
