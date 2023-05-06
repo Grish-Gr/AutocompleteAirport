@@ -1,2 +1,2 @@
 # Тестовое задание стажировки Java-разработчиков
-Библиотека autocomplete вводимого текста (jar файл https://drive.google.com/file/d/1teZ7uemP8YTvNt2yJIWkmuwa1QPLabKl/view?usp=sharing)
+Библиотека autocomplete вводимого текста (ссылка на библиотеку (jar) https://drive.google.com/file/d/11baEh_MZo-uT_1enhyWL_DRVMYdqA2Bl/view?usp=share_link)
