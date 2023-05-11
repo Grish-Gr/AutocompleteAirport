@@ -5,6 +5,7 @@ import maksim.ter.filters.expressions.FloatExpression;
 import maksim.ter.filters.expressions.IntegerExpression;
 import maksim.ter.filters.expressions.StringExpression;
 import org.mvel2.MVEL;
+import org.mvel2.jsr223.MvelBindings;
 
 import java.util.HashMap;
 import java.util.Map;

@@ -7,10 +7,8 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.util.Scanner;
 
 public class AutocompleteAirportsServiceTest {
-
     @Test
     public void limitTimeSearchTest() throws IOException, WrongRequestFilterException {
         InputStream stream = Thread.currentThread().getContextClassLoader().getResourceAsStream("airports.csv");

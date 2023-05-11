@@ -9,6 +9,9 @@ public class FloatExpression extends Expression<Float> {
 
     @Override
     public boolean check(String column) {
+        if (!Character.isDigit(column.charAt(0))){
+            return false;
+        }
         float num = Float.parseFloat(column);
         switch (operation){
             case EQUALS: return num == value;

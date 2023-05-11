@@ -10,6 +10,9 @@ public class IntegerExpression extends Expression<Integer> {
 
     @Override
     public boolean check(String column) {
+        if (!Character.isDigit(column.charAt(0))){
+            return false;
+        }
         int num = Integer.parseInt(column);
         switch (operation){
             case EQUALS: return num == value;
